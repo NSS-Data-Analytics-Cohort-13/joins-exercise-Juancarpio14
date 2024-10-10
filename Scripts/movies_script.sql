@@ -53,6 +53,31 @@ ORDER BY bud DESC
 LIMIT 5;
 
 --6. How many movies in the dataset are distributed by a company which is not headquartered in California? Which of these movies has the highest imdb rating?
+SELECT s.film_title
+, d.company_name
+,r.imdb_rating,d.headquarters
+FROM specs as s
+INNER JOIN distributors as d
+ON s.domestic_distributor_id=d.distributor_id
+INNER JOIN rating as r
+USING (movie_id)
+WHERE d.headquarters NOT ILIKE '%, CA%'
+GROUP BY s.film_title,d.company_name,r.imdb_rating,d.headquarters
+ORDER BY r.imdb_rating DESC;
+--ANSWER 6. 2 movies with Dirty Dancing as the highest imdb rating(7.0)
+
+--7. Which have a higher average rating, movies which are over two hours long or movies which are under two hours?
+SELECT
+	CASE
+		WHEN length_in_min<120 THEN 'under_2_hours'
+		WHEN length_in_min>120 THEN 'over_2_hours'
+		WHEN length_in_min=120 THEN 'exactly_2_hours'
+	END AS under_over_exactly_2_hours,
+	ROUND(AVG(imdb_rating),2)
+FROM specs
+INNER JOIN rating
+ON specs.movie_id=rating.movie_id
+GROUP BY under_over_exactly_2_hours
 
 
-7. Which have a higher average rating, movies which are over two hours long or movies which are under two hours?
+	
